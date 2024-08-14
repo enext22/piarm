@@ -12,10 +12,12 @@
 
     👉 Ready to explore and create with us? Click [|link_sf_facebook|] and join today!
 
-PiArm - SunFounder Robotic Arm for Raspberry Pi
+PiArm - SunFounder |link_PiArm| for Raspberry Pi
 ====================================================
 
-Thank you for choosing our PiArm.
+* |link_Robotic_Arm|
+
+Thank you for choosing our |link_PiArm|.
 
 PiArm is a three-degree-of-freedom robotic arm for Raspberry Pi. It has 3 interchangeable parts - bucket, hanging clip and solenoid - to help you perform different tasks.
 

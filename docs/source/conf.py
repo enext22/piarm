@@ -108,5 +108,12 @@ rst_epilog = """
 
     <a href="https://bit.ly/raphaelkit" target="_blank">here</a>
     
+.. |link_Robotic_Arm| raw:: html
+
+    <a href="https://www.sunfounder.com/products/piarm_robot_kit?_pos=2&_sid=de6c5ddbd&_ss=r" target="_blank">Purchase Link for Robotic Arm</a>
+
+.. |link_PiArm| raw:: html
+
+    <a href="https://www.sunfounder.com/products/piarm_robot_kit?_pos=2&_sid=de6c5ddbd&_ss=r" target="_blank">Robotic Arm</a>
 
 """
