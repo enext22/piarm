@@ -9,8 +9,7 @@ sleep(0.01)
 
 leftJoystick = Joystick(ADC('A0'),ADC('A1'),Pin('D0'))
 rightJoystick = Joystick(ADC('A2'),ADC('A3'),Pin('D1'))
-
-arm = PiArm([1,2,3])
+arm = PiArm(['P0','P1','P2'])
 arm.hanging_clip_init(PWM('P3'))
 arm.set_offset([0,0,0])
 

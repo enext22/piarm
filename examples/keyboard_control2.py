@@ -10,7 +10,7 @@ import termios
 reset_mcu()
 sleep(0.01)
 
-arm = PiArm([1,2,3])
+arm = PiArm(['P0','P1','P2'])
 arm.hanging_clip_init(PWM('P3'))
 arm.set_offset([0,0,0])
 controllable = 0
@@ -66,10 +66,10 @@ def control(key):
         flag = True
     
     if key == 'j':
-        clip -= 1
+        clip -= 5
         flag = True		
     elif key == 'l':
-        clip += 1
+        clip += 5
         flag = True	
     
     if flag == True:

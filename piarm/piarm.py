@@ -13,8 +13,9 @@ class PiArm(Robot):
     B = 80
     
     def __init__(self, pin_list,steps_path=f'/home/{user_name}/.config/piarm/steps_record.json'):
-        super().__init__(pin_list, group=3)
+        super().__init__(pin_list)
         # define variables
+        self.pins = pin_list
         self.component = 'none'
         self.speed = 50
         self.current_coord = [0, 80, 80] 
@@ -59,13 +60,15 @@ class PiArm(Robot):
         self.speed = speed 
     
     def bucket_init(self, pin):
-        self.bucket = Servo(pin)
+        print(f'Bucket Pin: {pin.channel}')
+        self.bucket = Servo(pin.channel)
         self.bucket_angle = 0
         self.component = 'bucket'
         self.data_index = 1
 
     def hanging_clip_init(self, pin):
-        self.hanging_clip = Servo(pin)
+        print(f'Hanging Clip Pin: {pin.channel}')
+        self.hanging_clip = Servo(pin.channel)
         self.hanging_clip_angle = 0
         self.component = 'hanging_clip'
         self.data_index = 2
@@ -76,7 +79,7 @@ class PiArm(Robot):
         self.component = 'electromagnet'
         self.data_index = 3
 
-    def set_angle(self, angles,israise=False):
+    def set_angle(self, angles, israise=False):
         result,angles = self.limit_angle(angles)
         if result == True:
             if israise == True:
@@ -89,7 +92,7 @@ class PiArm(Robot):
         else:
             self.current_coord = self.coord_temp
 
-        self.servo_move(angles, self.speed)
+        self.servo_move(angles)
         
     def coord2polar(self, coord):
         x, y, z = coord
@@ -195,8 +198,9 @@ class PiArm(Robot):
         self.component_staus = angle
     
     def set_hanging_clip(self, angle):
-        # angle = self.limit(-50,90,angle)
+        angle = self.limit(-50,90,angle)
         self.hanging_clip.angle(angle)
+        #self.hanging_clip_angle = angle
         self.component_staus = angle
     
     def set_electromagnet(self, status):

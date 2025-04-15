@@ -7,7 +7,7 @@ from piarm import PiArm
 reset_mcu()
 sleep(0.01)
 
-arm = PiArm([1,2,3])
+arm = PiArm([0,1,2])
 #arm.bucket_init(PWM('P3'))
 arm.hanging_clip_init(PWM('P3'))
 #arm.electromagnet_init(PWM('P3'))
