@@ -1,14 +1,23 @@
 from robot_hat import Servo,PWM,Joystick,ADC,Pin
 from robot_hat.utils import reset_mcu
 from time import sleep
+import logging
+import RPi.GPIO as GPIO
 
 from piarm import PiArm
+
+
+logging.basicConfig(level=logging.ERROR)
 
 reset_mcu()
 sleep(0.01)
 
-leftJoystick = Joystick(ADC('A0'),ADC('A1'),Pin('D0'))
-rightJoystick = Joystick(ADC('A2'),ADC('A3'),Pin('D1'))
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(17, GPIO.IN) #D0
+#GPIO.setup(4, GPIO.IN) #D1
+
+leftJoystick = Joystick('A0','A1',17)
+rightJoystick = Joystick('A2','A3',4)
 arm = PiArm(['P0','P1','P2'])
 arm.hanging_clip_init(PWM('P3'))
 arm.set_offset([0,0,0])
@@ -19,31 +28,49 @@ def _angles_control():
     alpha,beta,gamma = arm.servo_positions
     clip = arm.component_staus
 
-    if leftJoystick.read_status() == "up":
+    x_val = ADC('A0').read()
+    y_val = ADC('A1').read()
+
+    #print(f'DEFAULT X IS {x_val}')
+    #print(f'DEFAULT Y IS {y_val}')
+    #sleep(5)
+
+    if leftJoystick.read_status_y() == "up":
         alpha += 1
         flag = True
-    elif leftJoystick.read_status() == "down":
+    elif leftJoystick.read_status_y() == "down":
         alpha -= 1
         flag = True
-    if leftJoystick.read_status() == "left":
+    #elif leftJoystick.read_status_y() == "stall":
+    #    flag = False
+
+    if leftJoystick.read_status_x() == "left":
         gamma += 1
         flag = True
-    elif leftJoystick.read_status() == "right":
+    elif leftJoystick.read_status_x() == "right":
         gamma -= 1
         flag = True
-    if rightJoystick.read_status() == "up":
+    #elif leftJoystick.read_status_x() == "stall":
+    #    flag = False
+
+
+    if rightJoystick.read_status_y() == "up":
         beta += 1
         flag = True
-    elif rightJoystick.read_status() == "down":
+    elif rightJoystick.read_status_y() == "down":
         beta -= 1
         flag = True
+    #elif rightJoystick.read_status_y() == "stall":
+    #    flag = False
         
-    if leftJoystick.read_status() == "pressed": 	
+    if leftJoystick.read_status_b() == "pressed": 	
         clip += 2
         flag = True
-    elif rightJoystick.read_status() == "pressed":	
+    elif rightJoystick.read_status_b() == "pressed":	
         clip -= 2
         flag = True
+    #else:
+    #    flag = False
 
     if flag == True:
         arm.set_angle([alpha,beta,gamma])
