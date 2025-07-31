@@ -1,3 +1,5 @@
+# RUN FILE FROM CLI WITH 'xvfb-run python [NAME].py' if accessing over ssh with no physical display connected
+
 from robot_hat import Servo,PWM,Joystick,ADC,Pin
 from robot_hat.utils import reset_mcu
 from time import sleep
@@ -26,7 +28,7 @@ arm.set_offset([0,0,0])
 
 def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
 
-    arm.speed = 100
+    arm.speed = 300
     flag = False
     alpha,beta,gamma = arm.servo_positions
     clip = arm.component_staus
@@ -54,7 +56,6 @@ def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
         beta += 5
         flag = True
 
-        
     if pygame.joystick.Joystick(0).get_button(2): # X button is pressed
         clip += 2
         flag = True
@@ -68,7 +69,7 @@ def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
         arm.set_angle([alpha,beta,gamma])
         arm.set_hanging_clip(clip)
         print('x_val_left: %d, y_val_left: %d,   x_val_right: %d, y_val_right: %d' %(x_val_left, y_val_left, x_val_left, y_val_left))
-        print(arm.servo_positions)
+        #print(arm.servo_positions)
         #print('servo angles: %s , clip angle: %s '%(arm.servo_positions,arm.component_staus))
 
 #if __name__ == "__main__":
@@ -81,10 +82,13 @@ pygame.init()
 pygame.joystick.Joystick(0).init()
 clock = pygame.time.Clock()
 
+
 while True:
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+           break
         if event.type == pygame.JOYBUTTONDOWN:
-            print(event)
+           #print(event)
         #print(event)
     x_val_left = round(pygame.joystick.Joystick(0).get_axis(0))
     y_val_left = round(pygame.joystick.Joystick(0).get_axis(1))
@@ -95,3 +99,5 @@ while True:
     _angles_control(x_val_left, y_val_left, x_val_right, y_val_right)
     sleep(0.01)
     clock.tick(180)
+
+pygame.quit()
