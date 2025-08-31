@@ -6,6 +6,7 @@ from time import sleep
 import logging
 import RPi.GPIO as GPIO
 import pygame
+import sys
 
 from piarm import PiArm
 
@@ -84,16 +85,23 @@ clock = pygame.time.Clock()
 
 # low freq [0,1], high frequency [0,1], duration in ms
 pygame.joystick.Joystick(0).rumble(0.5, 0.8, 1000) # rumble for 1s
+sleep(1)
 pygame.joystick.Joystick(0).stop_rumble()
 
+status = True
 
-while True:
+while status:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
            break
+        if pygame.joystick.Joystick(0).get_button(6):
+	   # press minus button on the controller
+           status = False
+           print("### User Exited Process ###")
+           break
         #if event.type == pygame.JOYBUTTONDOWN:
            #print(event)
-        #print(event)
+
     x_val_left = round(pygame.joystick.Joystick(0).get_axis(0))
     y_val_left = round(pygame.joystick.Joystick(0).get_axis(1))
 
