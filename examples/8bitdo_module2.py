@@ -82,12 +82,16 @@ pygame.init()
 pygame.joystick.Joystick(0).init()
 clock = pygame.time.Clock()
 
+pygame.joystick.Joystick(0).rumble()
+sleep(5)
+pygame.joystick.Joystick(0).stop_rumble()
+
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
            break
-        if event.type == pygame.JOYBUTTONDOWN:
+        #if event.type == pygame.JOYBUTTONDOWN:
            #print(event)
         #print(event)
     x_val_left = round(pygame.joystick.Joystick(0).get_axis(0))
@@ -98,6 +102,11 @@ while True:
     #print('x_val_left: %d, y_val_left: %d' %(x_val_left, y_val_left))
     _angles_control(x_val_left, y_val_left, x_val_right, y_val_right)
     sleep(0.01)
+
+    # if arm end-effector is in range of objects
+    # trigger rumble effect
+    # stop rumble effect
+
     clock.tick(180)
 
 pygame.quit()
