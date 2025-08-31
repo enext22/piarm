@@ -1,9 +1,11 @@
+# simple test function to validate ultrasonic distance sensor functionality
+
 import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BOARD)
 
-GPIO_TRIGGER = 12
+GPIO_TRIGGER = 12 # must be PCM_CLK
 GPIO_ECHO = 11
 
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)

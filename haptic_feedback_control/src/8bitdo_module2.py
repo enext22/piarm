@@ -16,16 +16,14 @@ logging.basicConfig(level=logging.ERROR)
 reset_mcu()
 sleep(0.01)
 
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(17, GPIO.IN) #D0
-#GPIO.setup(4, GPIO.IN) #D1
+def init_arm():
+    arm = PiArm(['P0','P1','P2'])
+    arm.hanging_clip_init(PWM('P3'))
+    arm.set_offset([0,0,0])
 
-#leftJoystick = pygame.joystick.Joystick(0)
-#rightJoystick = pygame.joystick.Joystick(0)
+    return arm
 
-arm = PiArm(['P0','P1','P2'])
-arm.hanging_clip_init(PWM('P3'))
-arm.set_offset([0,0,0])
+arm = init_arm()
 
 def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
 
