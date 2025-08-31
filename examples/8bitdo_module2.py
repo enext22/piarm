@@ -84,7 +84,9 @@ pygame.joystick.Joystick(0).init()
 clock = pygame.time.Clock()
 
 # low freq [0,1], high frequency [0,1], duration in ms
-pygame.joystick.Joystick(0).rumble(0.5, 0.8, 1000) # rumble for 1s
+# can scale vibration intensity as a function of distance from target
+# along with SLOWING the grab motor
+pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000) # rumble for 1s
 sleep(1)
 pygame.joystick.Joystick(0).stop_rumble()
 
