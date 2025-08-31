@@ -82,8 +82,8 @@ pygame.init()
 pygame.joystick.Joystick(0).init()
 clock = pygame.time.Clock()
 
-pygame.joystick.Joystick(0).rumble()
-sleep(5)
+# low freq [0,1], high frequency [0,1], duration in ms
+pygame.joystick.Joystick(0).rumble(0.5, 0.8, 1000) # rumble for 1s
 pygame.joystick.Joystick(0).stop_rumble()
 
 
