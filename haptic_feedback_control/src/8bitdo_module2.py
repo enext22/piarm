@@ -117,4 +117,7 @@ while status:
 
     clock.tick(180)
 
+# Return to origin position
+arm.set_angle([0,0,0])
+
 pygame.quit()
