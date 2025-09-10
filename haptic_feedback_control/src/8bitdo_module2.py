@@ -1,12 +1,11 @@
 # RUN FILE FROM CLI WITH 'xvfb-run python [NAME].py' if accessing over ssh with no physical display connected
 
-from robot_hat import Servo,PWM,Joystick,ADC,Pin
+from robot_hat import Servo, PWM, ADC, Pin, Ultrasonic
 from robot_hat.utils import reset_mcu
 from time import sleep
 import logging
 import RPi.GPIO as GPIO
 import pygame
-import sys
 
 from piarm import PiArm
 
@@ -16,12 +15,17 @@ logging.basicConfig(level=logging.ERROR)
 reset_mcu()
 sleep(0.01)
 
+LIMIT = 6 # 6cm limit for basic object detection
+trig = Pin("D0")
+echo = Pin("D1")
+
 def init_arm():
     arm = PiArm(['P0','P1','P2'])
     arm.hanging_clip_init(PWM('P3'))
     arm.set_offset([0,0,0])
 
     return arm
+
 
 arm = init_arm()
 
@@ -68,6 +72,7 @@ def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
         arm.set_angle([alpha,beta,gamma])
         arm.set_hanging_clip(clip)
         print('x_val_left: %d, y_val_left: %d,   x_val_right: %d, y_val_right: %d' %(x_val_left, y_val_left, x_val_left, y_val_left))
+        print('\nClip Angle: %d', clip)
         #print(arm.servo_positions)
         #print('servo angles: %s , clip angle: %s '%(arm.servo_positions,arm.component_staus))
 
@@ -84,11 +89,14 @@ clock = pygame.time.Clock()
 # low freq [0,1], high frequency [0,1], duration in ms
 # can scale vibration intensity as a function of distance from target
 # along with SLOWING the grab motor
-pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000) # rumble for 1s
-sleep(1)
-pygame.joystick.Joystick(0).stop_rumble()
+# pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000) # rumble for 1s
+# pygame.joystick.Joystick(0).stop_rumble()
 
 status = True
+
+# setup distance sensor
+hcsr04 = Ultrasonic(trig, echo)
+
 
 while status:
     for event in pygame.event.get():
@@ -114,10 +122,19 @@ while status:
     # if arm end-effector is in range of objects
     # trigger rumble effect
     # stop rumble effect
+    dist = hcsr04.read()
+    if (dist < LIMIT): #and (arm.component_staus < -20):
+        # rumble controller
+        pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000)
+    else:
+        # stop rumble
+        pygame.joystick.Joystick(0).stop_rumble()
+
 
     clock.tick(180)
 
 # Return to origin position
 arm.set_angle([0,0,0])
+arm.set_hanging_clip(-40) # fully opened clip, otherwise causes false triggers of ultrasonic from clip frame
 
 pygame.quit()
