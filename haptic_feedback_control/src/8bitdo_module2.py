@@ -6,6 +6,7 @@ from time import sleep
 import logging
 import RPi.GPIO as GPIO
 import pygame
+import sys
 
 from piarm import PiArm
 
@@ -15,9 +16,18 @@ logging.basicConfig(level=logging.ERROR)
 reset_mcu()
 sleep(0.01)
 
-LIMIT = 6 # 6cm limit for basic object detection
-trig = Pin("D0")
-echo = Pin("D1")
+
+use_dist_sensor = False
+
+if len(sys.argv) > 1:
+    arg_1 = sys.argv[1]
+
+    if arg_1 == '--dist' or arg_1 == '-d':  
+        print("\n### Using Distance Sensor ###\n")
+        use_dist_sensor = True
+        LIMIT = 6 # 6cm limit for basic object detection
+        trig = Pin("D0")
+        echo = Pin("D1")
 
 def init_arm():
     arm = PiArm(['P0','P1','P2'])
@@ -94,8 +104,9 @@ clock = pygame.time.Clock()
 
 status = True
 
-# setup distance sensor
-hcsr04 = Ultrasonic(trig, echo)
+if use_dist_sensor:
+    # setup distance sensor
+    hcsr04 = Ultrasonic(trig, echo)
 
 
 while status:
@@ -119,16 +130,17 @@ while status:
     _angles_control(x_val_left, y_val_left, x_val_right, y_val_right)
     sleep(0.01)
 
-    # if arm end-effector is in range of objects
-    # trigger rumble effect
-    # stop rumble effect
-    dist = hcsr04.read()
-    if (dist < LIMIT): #and (arm.component_staus < -20):
-        # rumble controller
-        pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000)
-    else:
-        # stop rumble
-        pygame.joystick.Joystick(0).stop_rumble()
+    if use_dist_sensor:
+        # if arm end-effector is in range of objects
+        # trigger rumble effect
+        # stop rumble effect
+        dist = hcsr04.read()
+        if (dist < LIMIT): #and (arm.component_staus < -20):
+            # rumble controller
+            pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000)
+        else:
+            # stop rumble
+            pygame.joystick.Joystick(0).stop_rumble()
 
 
     clock.tick(180)

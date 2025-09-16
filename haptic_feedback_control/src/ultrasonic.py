@@ -43,6 +43,5 @@ pyplot.show()
 
 #while True:
 #    val = hc_sr04.read()
-#    animate_readings(time, data, val)
 #    print(val)
 #    sleep(1)
