@@ -7,6 +7,7 @@ import logging
 import RPi.GPIO as GPIO
 import pygame
 import sys
+import controller_functions
 
 from piarm import PiArm
 
@@ -25,7 +26,8 @@ if len(sys.argv) > 1:
     if arg_1 == '--dist' or arg_1 == '-d':  
         print("\n### Using Distance Sensor ###\n")
         use_dist_sensor = True
-        LIMIT = 6 # 6cm limit for basic object detection
+        RANGE_MAX = 7 # 6cm limit for basic object detection
+        RANGE_TARGET = 5
         trig = Pin("D0")
         echo = Pin("D1")
 
@@ -36,8 +38,10 @@ def init_arm():
 
     return arm
 
-
 arm = init_arm()
+
+EE_default_angle_increment = 2
+EE_angle_increment = 2 # End-effector angle increment
 
 def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
 
@@ -70,23 +74,20 @@ def _angles_control(x_val_left, y_val_left, x_val_right, y_val_right):
         flag = True
 
     if pygame.joystick.Joystick(0).get_button(2): # X button is pressed
-        clip += 2
+        clip += EE_angle_increment
         flag = True
     elif pygame.joystick.Joystick(0).get_button(1): # B button is pressed	
-        clip -= 2
+        clip -= EE_default_angle_increment
         flag = True
-
 
 
     if flag == True:
         arm.set_angle([alpha,beta,gamma])
         arm.set_hanging_clip(clip)
-        print('x_val_left: %d, y_val_left: %d,   x_val_right: %d, y_val_right: %d' %(x_val_left, y_val_left, x_val_left, y_val_left))
-        print('\nClip Angle: %d', clip)
-        #print(arm.servo_positions)
-        #print('servo angles: %s , clip angle: %s '%(arm.servo_positions,arm.component_staus))
+        print('\nx_val_left: %d, y_val_left: %d,   x_val_right: %d, y_val_right: %d' %(x_val_left, y_val_left, x_val_left, y_val_left))
+        print('\nClip Angle Adjustment: %d', clip)
+        logging.debug('\nServo angles: %s , Clip angle: %s '%(arm.servo_positions,arm.component_staus))
 
-#if __name__ == "__main__":
 
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
@@ -95,12 +96,6 @@ print(joysticks)
 pygame.init()
 pygame.joystick.Joystick(0).init()
 clock = pygame.time.Clock()
-
-# low freq [0,1], high frequency [0,1], duration in ms
-# can scale vibration intensity as a function of distance from target
-# along with SLOWING the grab motor
-# pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000) # rumble for 1s
-# pygame.joystick.Joystick(0).stop_rumble()
 
 status = True
 
@@ -114,33 +109,47 @@ while status:
         if event.type == pygame.QUIT:
            break
         if pygame.joystick.Joystick(0).get_button(6):
-	   # press minus button on the controller
+           # press minus button on the controller
            status = False
            print("### User Exited Process ###")
            break
-        #if event.type == pygame.JOYBUTTONDOWN:
-           #print(event)
+
+        if logging.getLevelName == logging.DEBUG:
+            if event.type == pygame.JOYBUTTONDOWN:
+                print(f'\nPygame Joystick Event: {event}')
 
     x_val_left = round(pygame.joystick.Joystick(0).get_axis(0))
     y_val_left = round(pygame.joystick.Joystick(0).get_axis(1))
 
     x_val_right = round(pygame.joystick.Joystick(0).get_axis(3))
     y_val_right = round(pygame.joystick.Joystick(0).get_axis(4))
-    #print('x_val_left: %d, y_val_left: %d' %(x_val_left, y_val_left))
+
     _angles_control(x_val_left, y_val_left, x_val_right, y_val_right)
     sleep(0.01)
 
     if use_dist_sensor:
         # if arm end-effector is in range of objects
-        # trigger rumble effect
-        # stop rumble effect
         dist = hcsr04.read()
-        if (dist < LIMIT): #and (arm.component_staus < -20):
+        if (dist < RANGE_MAX): #and (arm.component_staus < -20):
             # rumble controller
-            pygame.joystick.Joystick(0).rumble(0.1, 0.3, 1000)
+            high_freq = (RANGE_MAX - round(dist))*0.1 # subtracting from limit because we want the LOWER sensor readings to trigger HIGHER vibration
+            low_freq = (high_freq - 0.2) if high_freq > 0.2 else 0.1 # low_freq defaults to lowest setting 0.1 if distance from object is high
+
+            if high_freq < 0.2: high_freq = 0.2
+
+            pygame.joystick.Joystick(0).rumble(low_freq, high_freq, 1000) # rumble for 1s at specified frequencies in range [0, 1]
+            print(f'\nRumble Min: {low_freq}, Rumble Max: {high_freq}')
+
+            # additionally we must ADJUST the speed of change of our clip
+            ratio = abs(RANGE_TARGET - dist)/RANGE_MAX
+            EE_angle_increment = EE_default_angle_increment * ratio #
+            print(f'\nNew EE angle increment is: {EE_angle_increment}')
+
         else:
             # stop rumble
             pygame.joystick.Joystick(0).stop_rumble()
+            # reset EE_angle_increment
+            EE_angle_increment = EE_default_angle_increment
 
 
     clock.tick(180)
