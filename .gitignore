@@ -1,4 +1,4 @@
-examples/
+examples/**
 .vscode/
 build/
 dist/
