@@ -12,7 +12,11 @@
 - Created feedback loop with HC-SR04 data slowing the gripper closure speed relative to its proximity to the target
 
 ## Videos:
-[![PiArm Grip Speed Control]](https://youtu.be/EFDYqXAfyPo)
+[PiArm Grip Speed Control](https://youtu.be/EFDYqXAfyPo)
+[Haptic Feedback based on PiArm Proximity](https://youtu.be/asg4tYvbsW0)
+
+[Haptic Feedback Test](https://youtu.be/Cik9kEp_D6Y)
+[Ultrasonic Sensor Data Visualization](https://youtube.com/shorts/NoKNcWxm4D4?feature=share)
 
 
 ## Other Media:
