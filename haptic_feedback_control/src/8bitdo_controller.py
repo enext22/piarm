@@ -104,7 +104,7 @@ while proceed:
             # additionally we must ADJUST the speed of change of our clip
             ratio = abs(RANGE_TARGET - dist)/RANGE_MAX
             EE_angle_increment = EE_default_angle_increment * ratio #
-            print(f'\nNew EE angle increment is: {EE_angle_increment}')
+            print(f'New EE angle increment is: {EE_angle_increment}')
 
         else:
             # stop rumble
