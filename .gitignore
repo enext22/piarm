@@ -1,0 +1,8 @@
+examples/
+.vscode/
+build/
+dist/
+haptic_feedback_control/src/__pycache__/
+haptic_feedback_control/tests/__pycache__/
+piarm.egg-info/
+piarm/__pycache__/
