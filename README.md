@@ -1,7 +1,7 @@
 
 # Haptic Feedback for Grip Control on Robotic Arm
-Author: Emily Edwards
-Last Updated: September 25, 2025
+- Author: Emily Edwards
+- Last Updated: September 25, 2025
 
 ## Work Summary Log:
 - Debugged & integrated piarm Hat standard libraries
